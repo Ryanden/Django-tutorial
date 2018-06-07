@@ -1,5 +1,5 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, get_object_or_404
 from django.template import loader
 
 # Create your views here.
@@ -24,9 +24,9 @@ def index(request):
     }
 
     #
-    html = template.render(context, request)
-
-    return HttpResponse(html)
+    # html = template.render(context, request)
+    #
+    # return HttpResponse(html)
 
     return render(request, 'polls/index.html', context)
 
@@ -34,8 +34,30 @@ def index(request):
     # return HttpResponse(output)
 
 
+def custom_get_object_or_404(model, **kwargs):
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        raise Http404()
+
+
 def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
+
+    try:
+        question = Question.objects.get(id=question_id)
+
+    except Question.DoesNotExist:
+        raise Http404('파일없어')
+
+    question = get_object_or_404(Question, id=question_id)
+
+    question = custom_get_object_or_404(Question, id=question_id)
+
+    context = {
+        'question': question
+    }
+
+    return render(request, 'polls/detail.html', context)
 
 
 def results(request, question_id):
