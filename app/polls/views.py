@@ -1,15 +1,37 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.template import loader
 
 # Create your views here.
-from polls.models import Question
+from .models import Question
 
 
 def index(request):
 
+    # DB에 있는 Question 중에 가장 최근에 발행(pub_date)로 된 순서대로 최대 5개에 해당하는 QuerySet
+    # latest_question_list 변수에 할당
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    output = ', '.join([q.question_text for q in latest_question_list])
-    return HttpResponse(output)
+
+    # latest_question_list 의 각 Question 의 question_text 들을 ','로 연결시킨 문자열을 output 변수에 할당
+    # output = ', '.join([q.question_text for q in latest_question_list])
+
+    # 장고의 template 설정에 정의 된 방법으로,
+    # 주어진 인자에 해당하는 템플릿 파일을 가지는 인스턴스를 생성, 리턴
+    template = loader.get_template('polls/index.html')
+
+    context = {
+        'latest_question_list': latest_question_list,
+    }
+
+    #
+    html = template.render(context, request)
+
+    return HttpResponse(html)
+
+    return render(request, 'polls/index.html', context)
+
+    # 만들어진 질문 제목들을 모은 문자열을 HttpResponse 클래스의 생성로 전달, 인스턴스를 리턴
+    # return HttpResponse(output)
 
 
 def detail(request, question_id):
