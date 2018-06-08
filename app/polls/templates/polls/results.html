@@ -1,0 +1,11 @@
+
+<h1>{{ question.question_text }}</h1>
+
+
+{% for choice in question.choice_set.all %}
+
+    <p>항목 : {{ choice.choice_text }} /  득표수 :{{ choice.votes }} </p>
+
+
+{% endfor %}
+     <a href="{% url 'polls:index' %}">투표하러 돌아가기</a>
